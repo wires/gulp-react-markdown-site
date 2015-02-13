@@ -24,9 +24,10 @@ module.exports = function asyncStartHTTP(options) {
         middlewares: []
     });
 
-    function success(){
-        console.log('App server started at http://localhost:' + opts.app,
-            '\n\t~> wired to LR server http://localhost:' + ports.livereload);
+    opts.callback = opts.callback || function onSuccess() {
+        console.log(
+            'App server started at http://localhost:' + opts.app_port,
+            '\n\t~> LR server http://localhost:' + opts.livereload_port);
     }
 
     // content
@@ -40,7 +41,7 @@ module.exports = function asyncStartHTTP(options) {
         }, e);
 
     // start server
-    e.listen(opts.app_port);
+    e.listen(opts.app_port, opts.callback);
 
     // start livereload server
     livereload.listen(opts.livereload_port);
