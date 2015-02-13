@@ -1,5 +1,13 @@
 var lazypipe = require("lazypipe");
-var $ = require("gulp-load-plugins");
+// var $ = require("gulp-load-plugins");
+var gulp = require("gulp");
+
+var $ = {
+    browserify: require("gulp-browserify"),
+    concat: require("gulp-concat"),
+    uglify: require("gulp-uglify")
+};    
+    
 
 // help gulp-browserify not fail so hard all the time
 function handleError(err) {
