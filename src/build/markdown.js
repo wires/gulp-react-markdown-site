@@ -7,19 +7,19 @@ var $ = {
     util: require("gulp-util")
 };
 
-function splitParagraphs(s){
-    var r = /<p>[\s\S]*?<\/p>/ig;
-    var re = /<p>([\s\S]*?)<\/p>/i;
+var R = /<p>[\s\S]*?<\/p>/ig;
+var RE = /<p>([\s\S]*?)<\/p>/i;
 
-    return s.match(r).map(function(ss){
-        return ss.match(re)[1];
+function splitParagraphs(s){
+    return s.match(R).map(function(ss){
+        return ss.match(RE)[1];
     });
 }
 
-module.exports = function(target) {
+module.exports = function(targetFile) {
     return lazypipe()
         .pipe($.util.buffer)
-        .pipe($.markdownToJson, target)
+        .pipe($.markdownToJson, targetFile)
         .pipe(map, function(json){
             // parse file content
             var content = JSON.parse(json.toString());

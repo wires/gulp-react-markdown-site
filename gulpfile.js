@@ -8,7 +8,8 @@ var $ = require("gulp-load-plugins")();
 
 var build = {
     markdown: require("./src/build/markdown"),
-    browserify: require("./src/build/browserify")
+    browserify: require("./src/build/browserify"),
+    devserver: require("./src/build/httpserver")
 };
 
 // destination
@@ -30,6 +31,12 @@ gulp.task('html', function() {
         .pipe(dest());
 });
 
+// just copy the HTML
+gulp.task('style', function() {
+    return gulp.src("src/css/*.css")
+        .pipe(dest());
+});
+
 // bundle and minify the JS
 gulp.task('scripts', ['markdown'], function() {
     return build.browserify('src/js/index.js', 'bundle.js')
@@ -43,12 +50,14 @@ gulp.task('images', function() {
 });
 
 // full build
-gulp.task('build', ['scripts', 'html', 'images']);
+gulp.task('build', ['scripts', 'html', 'images', 'style']);
 
 gulp.task('default', ['build'], function(){
-    // asyncStartHTTP();
+    build.devserver({app_port: 5005});
+
     gulp.watch(['src/markdown/*.md'], ['markdown']);
     gulp.watch(['src/images/*.png'], ['images']);
     gulp.watch(['src/html/*.html'], ['html']);
+    gulp.watch(['src/css/*.css'], ['style']);
     gulp.watch(['src/js/**/*.js'], ['scripts']);
 });

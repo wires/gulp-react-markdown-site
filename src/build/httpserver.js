@@ -1,40 +1,47 @@
-var $ = require("gulp-load-plugins");
+var _ = require("lodash");
+
+var livereload = require("gulp-livereload");
 var express = require("express");
 var connectLR = require('connect-livereload');
 var path = require("path");
 
 // don't think this actually works
-$.livereload.options.debug = true;
+livereload.options.debug = true;
+
+// TODO use https://github.com/cloudhead/node-static ?
 
 // quick and dirty live reload
-module.exports = function asyncStartHTTP(opts) {
-    
-    var options = {
-        ports: opts.ports || {app: 3004, livereload: r},
-        rootPath: opts.rootPath || 'dist/',
-        middlewares: opts.middlewares || []
-    };
+module.exports = function asyncStartHTTP(options) {
 
     // create random port for live-reload server
-    var app_port = options.port || 3004;
-    var livereload_port = options.lrPort || r;
     var r = Math.floor(Math.random()*10000) + 30000;
 
+    // defaults
+    var opts = _.defaults(options, {
+        app_port: 3004,
+        livereload_port: r,
+        rootPath: 'dist/',
+        middlewares: []
+    });
+
     function success(){
-        console.log('App server started at http://localhost:' + ports.app,
+        console.log('App server started at http://localhost:' + opts.app,
             '\n\t~> wired to LR server http://localhost:' + ports.livereload);
     }
 
     // content
     var e = express()
-        .use(connectLR({port: ports.livereload}))
-        .use(express.static(path.resolve('dist/')));
+        .use(connectLR({port: opts.livereload_port}))
+        .use(express.static(path.resolve(opts.rootPath)));
 
+    // add middlewares
+    e = _.reduce(opts.middlewares, function(accum, middleware) {
+            return accum.use(middleware)
+        }, e);
 
-        
-        .use(upload)
-        .listen(ports.app, );
+    // start server
+    e.listen(opts.app_port);
 
-    // livereload
-    $.livereload.listen(ports.livereload);
+    // start livereload server
+    livereload.listen(opts.livereload_port);
 };
