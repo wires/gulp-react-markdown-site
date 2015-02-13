@@ -18,10 +18,15 @@ var dest = lazypipe()
     .pipe($.size)
     .pipe($.livereload);
 
+
+var z = lazypipe()
+    .pipe($.size)
+    .pipe(gulp.dest, 'src/precomile/');
+
 // process Markdown into JSON
 gulp.task('markdown', function(){
     return gulp.src('content/markdown/*.md')
-        // .pipe(build.markdown('content.json'))
+        .pipe(build.markdown('content.json')())
         .pipe(gulp.dest('src/precompile/'));
 });
 
