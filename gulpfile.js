@@ -18,17 +18,25 @@ var dest = lazypipe()
     .pipe($.size)
     .pipe($.livereload);
 
-
-var z = lazypipe()
-    .pipe($.size)
-    .pipe(gulp.dest, 'src/precomile/');
-
 // process Markdown into JSON
 gulp.task('markdown', function(){
     return gulp.src('content/markdown/*.md')
         .pipe(build.markdown('content.json')())
         .pipe(gulp.dest('src/precompile/'));
 });
+
+// copy images
+gulp.task('images', function() {
+    return gulp.src("content/images/*.png")
+        .pipe(dest());
+});
+
+// bundle and minify the JS
+gulp.task('scripts', ['markdown'], function() {
+    return build.browserify('src/js/index.js', 'bundle.js')
+        .pipe(dest());
+});
+
 
 // just copy the HTML
 gulp.task('html', function() {
@@ -42,26 +50,14 @@ gulp.task('style', function() {
         .pipe(dest());
 });
 
-// bundle and minify the JS
-gulp.task('scripts', ['markdown'], function() {
-    return build.browserify('src/js/index.js', 'bundle.js')
-        .pipe(dest());
-});
-
-// copy images
-gulp.task('images', function() {
-    return gulp.src("content/images/*.png")
-        .pipe(dest());
-});
-
 // full build
 gulp.task('build', ['scripts', 'html', 'images', 'style']);
 
 gulp.task('default', ['build'], function(){
     build.devserver({app_port: 5005});
 
-    gulp.watch(['src/markdown/*.md'], ['markdown']);
-    gulp.watch(['src/images/*.png'], ['images']);
+    gulp.watch(['content/markdown/*.md'], ['scripts']);
+    gulp.watch(['content/images/*.png'], ['images']);
     gulp.watch(['src/html/*.html'], ['html']);
     gulp.watch(['src/css/*.css'], ['style']);
     gulp.watch(['src/js/**/*.js'], ['scripts']);
